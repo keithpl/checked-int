@@ -334,6 +334,56 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 		)						\
 	)
 
+static CKDINT_INLINE int ckdint_test_ssub_sres(intmax_t a, intmax_t b,
+					       intmax_t min, intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixsub_saub_sres(intmax_t a, uintmax_t b,
+						      intmax_t min,
+						      intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixsub_ausb_sres(uintmax_t a, intmax_t b,
+						      intmax_t min,
+						      intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_usub_sres(uintmax_t a, uintmax_t b,
+					       intmax_t min, intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_ssub_ures(intmax_t a, intmax_t b,
+					       uintmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixsub_saub_ures(intmax_t a, uintmax_t b,
+						      uintmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
+						      uintmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_usub_ures(uintmax_t a, uintmax_t b,
+					       uintmax_t max)
+{
+	return 0;
+}
+
 #endif /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
