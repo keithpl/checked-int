@@ -35,27 +35,46 @@
 
 #define CKDINT_INLINE		CKDINT_ALWAYS_INLINE CKDINT_CONST
 
+#if (CKDINT_HAS_BUILTIN(__builtin_add_overflow_p) && \
+     CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) && \
+     CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p))
+
+#define ckdint_add_test(a, b, expr) \
+	__builtin_add_overflow_p((a), (b), (expr))
+
+#define ckjdint_sub_test(a, b, expr) \
+	__builtin_add_overflow_p((a), (b), (expr))
+
+#define ckdint_mul_test(a, b, expr) \
+	__builtin_mul_overflow_p((a), (b), (expr))
+
+#else /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
+
+
+
+#endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
+
 #if CKDINT_HAS_INCLUDE(<stdckdint.h>)
 
 #include <stdckdint.h>
 
-#define ckdint_add(res, x, y)	ckd_add((res), (x), (y))
-#define ckdint_sub(res, x, y)	ckd_sub((res), (x), (y))
-#define ckdint_mul(res, x, y)	ckd_mul((res), (x), (y))
+#define ckdint_add(res, a, b)	ckd_add((res), (a), (b))
+#define ckdint_sub(res, a, b)	ckd_sub((res), (a), (b))
+#define ckdint_mul(res, a, b)	ckd_mul((res), (a), (b))
 
 #else /* CKDINT_HAS_INCLUDE(<stdckdint.h>) */
 
-#if (CKDINT_HAS_BUILTIN(__builtin_add_overflow) && \
-     CKDINT_HAS_BUILTIN(__builtin_sub_overflow) && \
-     CKDINT_HAS_BUILTIN(__builtin_mul_overflow))
+#if CKDINT_HAS_BUILTIN(__builtin_add_overflow)
+#define ckdint_add(res, a, b)	__builtin_add_overflow((a), (b), (res))
+#endif
 
-#define ckdint_add(res, x, y)	__builtin_add_overflow((x), (y), (res))
-#define ckdint_sub(res, x, y)	__builtin_sub_overflow((x), (y), (res))
-#define ckdint_mul(res, x, y)	__builtin_mul_overflow((x), (y), (res))
+#if CKDINT_HAS_BUILTIN(__builtin_sub_overflow)
+#define ckdint_sub(res, a, b)	__builtin_sub_overflow((a), (b), (res))
+#endif
 
-#else /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow) */
-
-#endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow) */
+#if CKDINT_HAS_BUILTIN(__builtin_mul_overflow)
+#define ckdint_mul(res, a, b)	__builtin_mul_overflow((a), (b), (res))
+#endif
 
 #endif /* CKDINT_HAS_INCLUDE(<stdckdint.h>) */
 
