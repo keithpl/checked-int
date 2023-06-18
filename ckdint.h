@@ -178,6 +178,25 @@ static CKDINT_INLINE int ckdint_test_sadd_sres(intmax_t a, intmax_t b,
 	return ckdint_test_uadd((uintmax_t)a, (uintmax_t)b, (uintmax_t)max);
 }
 
+static CKDINT_INLINE int ckdint_test_mixadd_common(intmax_t a, uintmax_t b,
+						   uintmax_t max)
+{
+	uintmax_t diff;
+	uintmax_t min_abs;
+
+	if (b <= max)
+		return 0;
+
+	diff = b - max;
+
+	if (INTMAX_MIN < -INTMAX_MAX)
+		min_abs = (uintmax_t)INTMAX_MAX + 1;
+	else
+		min_abs = (uintmax_t)INTMAX_MAX;
+
+	return (diff > min_abs) || (a > (intmax_t)(-diff));
+}
+
 static CKDINT_INLINE int ckdint_test_mixadd_sres(intmax_t a, uintmax_t b,
 						 intmax_t min, intmax_t max)
 {
@@ -189,21 +208,7 @@ static CKDINT_INLINE int ckdint_test_mixadd_sres(intmax_t a, uintmax_t b,
 			return 1;
 	}
 
-	if (b > (uintmax_t)max) {
-		uintmax_t diff = b - (uintmax_t)max;
-
-		if (INTMAX_MIN < -INTMAX_MAX) {
-			if (diff > (uintmax_t)INTMAX_MAX + 1)
-				return 1;
-		} else {
-			if (diff > (uintmax_t)INTMAX_MAX)
-				return 1;
-		}
-
-		if (a > (intmax_t)(-diff))
-			return 1;
-	}
-	return 0;
+	return ckdint_test_mixadd_common(a, b, (uintmax_t)max);
 }
 
 static CKDINT_INLINE int ckdint_test_sadd_ures(intmax_t a, intmax_t b,
@@ -249,21 +254,7 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 	if (b < (uintmax_t)(-a))
 		return 1;
 
-	if (b > max) {
-		uintmax_t diff = b - max;
-
-		if (INTMAX_MIN < -INTMAX_MAX) {
-			if (diff > (uintmax_t)INTMAX_MAX + 1)
-				return 1;
-		} else {
-			if (diff > (uintmax_t)INTMAX_MAX)
-				return 1;
-		}
-
-		if (a > (intmax_t)(-diff))
-			return 1;
-	}
-	return 0;
+	return ckdint_test_mixadd_common(a, b, max);
 }
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_add_overflow_p) */
