@@ -40,13 +40,13 @@
      CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) && \
      CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p))
 
-#define ckdint_add_test(a, b, expr) \
+#define ckdint_test_add(a, b, expr) \
 	__builtin_add_overflow_p((a), (b), (expr))
 
-#define ckjdint_sub_test(a, b, expr) \
-	__builtin_add_overflow_p((a), (b), (expr))
+#define ckdint_test_sub(a, b, expr) \
+	__builtin_sub_overflow_p((a), (b), (expr))
 
-#define ckdint_mul_test(a, b, expr) \
+#define ckdint_test_mul(a, b, expr) \
 	__builtin_mul_overflow_p((a), (b), (expr))
 
 #else /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
@@ -88,15 +88,15 @@
 
 #if CKDINT_HAS_BUILTIN(__builtin_add_overflow_p)
 
-#define ckdint_add_test(a, b, expr) \
+#define ckdint_test_add(a, b, expr) \
 	__builtin_add_overflow_p((a), (b), (expr))
 
 #else /* CKDINT_HAS_BUILTIN(__builtin_add_overflow_p) */
 
-#define ckdint_add_test(a, b, expr) \
-	CKDINT_TEST_OP(CKDINT_TEST_ADD, (a), (b), (expr))
+#define ckdint_test_add(a, b, expr) \
+	CKDINT_TEST_OP(CKDINT_TEST_OP_ADD, (a), (b), (expr))
 
-#define CKDINT_TEST_ADD(a, b, min, max)				\
+#define CKDINT_TEST_OP_ADD(a, b, min, max)			\
 	(((min) < 0)						\
 		? CKDINT_TEST_ADD_SRES((a), (b), (min), (max))	\
 		: CKDINT_TEST_ADD_URES((a), (b), (max)))
@@ -258,6 +258,27 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 }
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_add_overflow_p) */
+
+#if CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p)
+
+#define ckdint_test_sub(a, b, expr) \
+	__builtin_sub_overflow_p((a), (b), (expr))
+
+#else /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
+
+#define ckdint_test_sub(a, b, expr) \
+	CKDINT_TEST_OP(CKDINT_TEST_OP_SUB, (a), (b), (expr))
+
+#define CKDINT_TEST_OP_SUB(a, b, min, max)			\
+	(((min) < 0)						\
+		? CKDINT_TEST_SUB_SRES((a), (b), (min), (max))	\
+		: CKDINT_TEST_SUB_URES((a), (b), (max)))
+
+#define CKDINT_TEST_SUB_SRES(a, b, min, max)
+
+#define CKDINT_TEST_SUB_URES(a, b, max)
+
+#endif /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
 
