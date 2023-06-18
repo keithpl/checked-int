@@ -274,9 +274,65 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 		? CKDINT_TEST_SUB_SRES((a), (b), (min), (max))	\
 		: CKDINT_TEST_SUB_URES((a), (b), (max)))
 
-#define CKDINT_TEST_SUB_SRES(a, b, min, max)
+#define CKDINT_TEST_SUB_SRES(a, b, min, max)			\
+	(CKDINT_IS_SIGNED(a)					\
+		? (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_ssub_sres(		\
+				(intmax_t)(a),			\
+				(intmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+			: ckdint_test_mixsub_saub_sres(		\
+				(intmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+		)						\
+		: (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_mixsub_uasb_sres(		\
+				(uintmax_t)(a),			\
+				(intmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+			: ckdint_test_usub_sres(		\
+				(uintmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+		)						\
+	)
 
-#define CKDINT_TEST_SUB_URES(a, b, max)
+#define CKDINT_TEST_SUB_URES(a, b, max)				\
+	(CKDINT_IS_SIGNED(a)					\
+		? (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_ssub_ures(		\
+				(intmax_t)(a),			\
+				(intmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+			: ckdint_test_mixsub_saub_ures(		\
+				(intmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+		)						\
+		: (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_mixsub_uasb_ures(		\
+				(uintmax_t)(a),			\
+				(intmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+			: ckdint_test_usub_ures(		\
+				(uintmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+		)						\
+	)
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
 
