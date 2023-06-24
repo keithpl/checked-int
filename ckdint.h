@@ -180,7 +180,7 @@ static CKDINT_INLINE int ckdint_test_sadd_sres(intmax_t a, intmax_t b,
 		return (a < (min - b)) || ((a + b) > max);
 
 	if (a < 0)
-		return (b < (min - a)) | ((a + b) > max);
+		return (b < (min - a)) || ((a + b) > max);
 
 	return ckdint_test_uadd((uintmax_t)a, (uintmax_t)b, (uintmax_t)max);
 }
@@ -195,13 +195,8 @@ static CKDINT_INLINE int ckdint_test_mixadd_common(intmax_t a, uintmax_t b,
 		return 0;
 
 	diff = b - max;
-
-	if (INTMAX_MIN < -INTMAX_MAX)
-		min_abs = (uintmax_t)INTMAX_MAX + 1;
-	else
-		min_abs = (uintmax_t)INTMAX_MAX;
-
-	return (diff > min_abs) || (a > (intmax_t)(-diff));
+	min_abs = CKDINT_SAFE_UNEGATE(INTMAX_MIN);
+	return (diff > min_abs) || (a > (intmax_t)-diff);
 }
 
 static CKDINT_INLINE int ckdint_test_mixadd_sres(intmax_t a, uintmax_t b,
@@ -210,7 +205,7 @@ static CKDINT_INLINE int ckdint_test_mixadd_sres(intmax_t a, uintmax_t b,
 	if (a >= 0)
 		return ckdint_test_uadd((uintmax_t)a, b, (uintmax_t)max);
 
-	if (min > a) {
+	if (a < min) {
 		if (b < (uintmax_t)(min - a))
 			return 1;
 	}
@@ -234,12 +229,7 @@ static CKDINT_INLINE int ckdint_test_sadd_ures(intmax_t a, intmax_t b,
 	}
 
 	if (a < 0) {
-		if (INTMAX_MIN < -INTMAX_MAX) {
-			if (a == INTMAX_MIN)
-				return 1;
-		}
-
-		if (b < -a)
+		if ((uintmax_t)b < CKDINT_SAFE_UNEGATE(a))
 			return 1;
 
 		return ((uintmax_t)(a + b) > max);
@@ -253,12 +243,7 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 	if (a >= 0)
 		return ckdint_test_uadd((uintmax_t)a, b, max);
 
-	if (INTMAX_MIN < -INTMAX_MAX) {
-		if ((a == INTMAX_MIN) && (b < (uintmax_t)INTMAX_MAX + 1))
-			return 1;
-	}
-
-	if (b < (uintmax_t)(-a))
+	if (b < CKDINT_SAFE_UNEGATE(a))
 		return 1;
 
 	return ckdint_test_mixadd_common(a, b, max);
