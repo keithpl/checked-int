@@ -432,6 +432,80 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
 
+#if CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p)
+
+#define ckdint_test_mul(a, b, expr) \
+	__builtin_mul_overflow_p((a), (b), (expr))
+
+#else /* CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p) */
+
+#define ckdint_test_mul(a, b, expr) \
+	CKDINT_TEST_OP(CKDINT_TEST_OP_MUL, (a), (b), (expr))
+
+#define CKDINT_TEST_OP_MUL(a, b, min, max)			\
+	(((min) < 0)						\
+		? CKDINT_TEST_MUL_SRES((a), (b), (min), (max))	\
+		: CKDINT_TEST_MUL_URES((a), (b), (max)))
+
+#define CKDINT_TEST_MUL_SRES(a, b, min, max)			\
+	(CKDINT_IS_SIGNED(a)					\
+		? (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_smul_sres(		\
+				(intmax_t)(a),			\
+				(intmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+			: ckdint_test_mixmul_sres(		\
+				(intmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+		: (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_mixmul_sres(		\
+				(intmax_t)(b),			\
+				(uintmax_t)(a),			\
+				(intmax_t)(min),		\
+				(intmax_t)(max)			\
+			)					\
+			: ckdint_test_umul_sres(		\
+				(uintmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+		)						\
+	)
+
+#define CKDINT_TEST_MUL_URES(a, b, max)				\
+	(CKDINT_IS_SIGNED(a)					\
+		? (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_smul_ures(		\
+				(intmax_t)(a),			\
+				(intmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+			: ckdint_test_mixmul_ures(		\
+				(intmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+		: (CKDINT_IS_SIGNED(b)				\
+			? ckdint_test_mixmul_ures(		\
+				(intmax_t)(b),			\
+				(uintmax_t)(a),			\
+				(uintmax_t)(max)		\
+			)					\
+			: ckdint_test_umul_ures(		\
+				(uintmax_t)(a),			\
+				(uintmax_t)(b),			\
+				(uintmax_t)(max)		\
+			)					\
+		)						\
+	)
+
+#endif /* CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p) */
+
 #endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
 
 #if CKDINT_HAS_INCLUDE(<stdckdint.h>)
