@@ -86,6 +86,13 @@
 			op((a), (b), 0, ULONG_MAX)		\
 	)
 
+#define CKDINT_SAFE_UNEGATE(x)					\
+	((INTMAX_MIN < -INTMAX_MAX)				\
+		? (((x) == INTMAX_MIN)				\
+			? ((uintmax_t)INTMAX_MAX + 1)		\
+			: ((uintmax_t)-(x)))			\
+		: ((uintmax_t)-(x)))
+
 #if CKDINT_HAS_BUILTIN(__builtin_add_overflow_p)
 
 #define ckdint_test_add(a, b, expr) \
@@ -300,7 +307,6 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 			: ckdint_test_usub_sres(		\
 				(uintmax_t)(a),			\
 				(uintmax_t)(b),			\
-				(intmax_t)(min),		\
 				(intmax_t)(max)			\
 			)					\
 		)						\
@@ -334,54 +340,109 @@ static CKDINT_INLINE int ckdint_test_mixadd_ures(intmax_t a, uintmax_t b,
 		)						\
 	)
 
+#define ckdint_test_sub_same_sign_sres(a, b, max)		\
+	(((a) < (b))						\
+		? ((INTMAX_MIN < -INTMAX_MAX)			\
+			? (((b) - (a) - 1) > (max))		\
+			: (((b) - (a)) > (max)))		\
+		: (((a) - (b)) > (max)))
+
+static CKDINT_INLINE int ckdint_test_usub_ures(uintmax_t a, uintmax_t b,
+					       uintmax_t max)
+{
+	return (a < b) || ((a - b) > max);
+}
+
+static CKDINT_INLINE int ckdint_test_usub_sres(uintmax_t a, uintmax_t b,
+					       intmax_t max)
+{
+	return ckdint_test_sub_same_sign_sres(a, b, (uintmax_t)max);
+}
+
 static CKDINT_INLINE int ckdint_test_ssub_sres(intmax_t a, intmax_t b,
 					       intmax_t min, intmax_t max)
 {
-	return 0;
+	if (a < 0) {
+		if (b >= 0)
+			return b > (a - min);
+
+		return ckdint_test_sub_same_sign_sres(a, b, max);
+	}
+
+	if (b > 0)
+		return ckdint_test_usub_sres((uintmax_t)a, (uintmax_t)b, max);
+
+	return a > (max + b);
 }
 
 static CKDINT_INLINE int ckdint_test_mixsub_saub_sres(intmax_t a, uintmax_t b,
 						      intmax_t min,
 						      intmax_t max)
 {
-	return 0;
+	if (a >= 0)
+		return ckdint_test_usub_sres((uintmax_t)a, b, max);
+
+	if ((a - min) < 0)
+		return 1;
+
+	return ((uintmax_t)(a - min) < b);
 }
 
-static CKDINT_INLINE int ckdint_test_mixsub_ausb_sres(uintmax_t a, intmax_t b,
+static CKDINT_INLINE int ckdint_test_mixsub_uasb_sres(uintmax_t a, intmax_t b,
 						      intmax_t min,
 						      intmax_t max)
 {
-	return 0;
-}
+	if (b >= 0)
+		return ckdint_test_usub_sres(a, (uintmax_t)b, max);
 
-static CKDINT_INLINE int ckdint_test_usub_sres(uintmax_t a, uintmax_t b,
-					       intmax_t min, intmax_t max)
-{
-	return 0;
+	if ((b - min) < 0)
+		return 1;
+
+	if (INTMAX_MIN < -INTMAX_MAX) {
+		if ((b == min) && !a)
+			return 1;
+	}
+	return (a > (uintmax_t)(b - min)) || (a > (uintmax_t)(max + b));
 }
 
 static CKDINT_INLINE int ckdint_test_ssub_ures(intmax_t a, intmax_t b,
 					       uintmax_t max)
 {
-	return 0;
+	if (a < 0) {
+		if ((b >= 0) || (a < b))
+			return 1;
+
+		return (uintmax_t)(a - b) > max;
+	}
+
+	if (b >= 0)
+		return ckdint_test_usub_ures((uintmax_t)a, (uintmax_t)b, max);
+
+	if (CKDINT_SAFE_UNEGATE(b) > max)
+		return 1;
+
+	return ((uintmax_t)a > (max - CKDINT_SAFE_UNEGATE(b)));
 }
 
 static CKDINT_INLINE int ckdint_test_mixsub_saub_ures(intmax_t a, uintmax_t b,
 						      uintmax_t max)
 {
-	return 0;
+	if (a < 0)
+		return 1;
+
+	if (b > (uintmax_t)a)
+		return 1;
+
+	return ((uintmax_t)a - b) > max;
 }
 
 static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 						      uintmax_t max)
 {
-	return 0;
-}
+	if (b >= 0)
+		return ckdint_test_usub_ures(a, (uintmax_t)b, max);
 
-static CKDINT_INLINE int ckdint_test_usub_ures(uintmax_t a, uintmax_t b,
-					       uintmax_t max)
-{
-	return 0;
+	return (a + CKDINT_SAFE_UNEGATE(b)) > max;
 }
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_sub_overflow_p) */
