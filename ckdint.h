@@ -504,6 +504,42 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 		)						\
 	)
 
+static CKDINT_INLINE int ckdint_test_smul_sres(intmax_t a, intmax_t b,
+					       intmax_t min, intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixmul_sres(intmax_t a, uintmax_t b,
+						 intmax_t min, intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_umul_sres(uintmax_t a, uintmax_t b,
+					       intmax_t min, intmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_smul_ures(intmax_t a, intmax_t b,
+					       uintmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_mixmul_ures(intmax_t a, uintmax_t b,
+						 uintmax_t max)
+{
+	return 0;
+}
+
+static CKDINT_INLINE int ckdint_test_umul_ures(uintmax_t a, uintmax_t b,
+					       uintmax_t max)
+{
+	return 0;
+}
+
 #endif /* CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p) */
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_{add,sub,mul}_overflow_p) */
