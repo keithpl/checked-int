@@ -462,6 +462,7 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 				(intmax_t)(min),		\
 				(intmax_t)(max)			\
 			)					\
+		)						\
 		: (CKDINT_IS_SIGNED(b)				\
 			? ckdint_test_mixmul_sres(		\
 				(intmax_t)(b),			\
@@ -469,7 +470,7 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 				(intmax_t)(min),		\
 				(intmax_t)(max)			\
 			)					\
-			: ckdint_test_umul_sres(		\
+			: ckdint_test_umul(			\
 				(uintmax_t)(a),			\
 				(uintmax_t)(b),			\
 				(uintmax_t)(max)		\
@@ -490,13 +491,14 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 				(uintmax_t)(b),			\
 				(uintmax_t)(max)		\
 			)					\
+		)						\
 		: (CKDINT_IS_SIGNED(b)				\
 			? ckdint_test_mixmul_ures(		\
 				(intmax_t)(b),			\
 				(uintmax_t)(a),			\
 				(uintmax_t)(max)		\
 			)					\
-			: ckdint_test_umul_ures(		\
+			: ckdint_test_umul(			\
 				(uintmax_t)(a),			\
 				(uintmax_t)(b),			\
 				(uintmax_t)(max)		\
@@ -504,40 +506,75 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 		)						\
 	)
 
+static CKDINT_INLINE int ckdint_test_umul(uintmax_t a, uintmax_t b, 
+					  uintmax_t max)
+{
+	return (b > 0) && (a > (max / b));
+}
+
 static CKDINT_INLINE int ckdint_test_smul_sres(intmax_t a, intmax_t b,
 					       intmax_t min, intmax_t max)
 {
-	return 0;
+	if (!a || !b)
+		return 0;
+
+	if (b < 0) {
+		if (a < 0)
+			return a < (max / b);
+
+		if (b == -1)
+			return (uintmax_t)a > CKDINT_SAFE_UNEGATE(min);
+
+		return a > (min / b);
+	}
+
+	if (a < 0)
+		return a < (min / b);
+
+	return a > (max / b);
 }
 
 static CKDINT_INLINE int ckdint_test_mixmul_sres(intmax_t a, uintmax_t b,
 						 intmax_t min, intmax_t max)
 {
-	return 0;
-}
+	if (!a || !b)
+		return 0;
 
-static CKDINT_INLINE int ckdint_test_umul_sres(uintmax_t a, uintmax_t b,
-					       intmax_t min, intmax_t max)
-{
-	return 0;
+	if (a < 0)
+		return CKDINT_SAFE_UNEGATE(a) > (CKDINT_SAFE_UNEGATE(min) / b);
+
+	return ckdint_test_umul((uintmax_t)a, b, (uintmax_t)max);
 }
 
 static CKDINT_INLINE int ckdint_test_smul_ures(intmax_t a, intmax_t b,
 					       uintmax_t max)
 {
-	return 0;
+	if (a < 0) {
+		if (b > 0)
+			return 1;
+
+		if (!b)
+			return 0;
+
+		return CKDINT_SAFE_UNEGATE(a) > (max / CKDINT_SAFE_UNEGATE(b));
+	}
+
+	if (!a)
+		return 0;
+
+	if (b < 0)
+		return 1;
+
+	return ckdint_test_umul((uintmax_t)a, (uintmax_t)b, max);
 }
 
 static CKDINT_INLINE int ckdint_test_mixmul_ures(intmax_t a, uintmax_t b,
 						 uintmax_t max)
 {
-	return 0;
-}
+	if (a >= 0)
+		return ckdint_test_umul((uintmax_t)a, b, max);
 
-static CKDINT_INLINE int ckdint_test_umul_ures(uintmax_t a, uintmax_t b,
-					       uintmax_t max)
-{
-	return 0;
+	return b > 0;
 }
 
 #endif /* CKDINT_HAS_BUILTIN(__builtin_mul_overflow_p) */
