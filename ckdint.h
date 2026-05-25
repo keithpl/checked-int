@@ -1,4 +1,4 @@
-#if !defined(CKDINT_H)
+#ifndef CKDINT_H
 #define CKDINT_H
 
 #include <limits.h>
@@ -58,10 +58,12 @@
 		short:			1,			\
 		int:			1,			\
 		long:			1,			\
+		long long:		1,			\
 		unsigned char:		0,			\
 		unsigned short:		0,			\
 		unsigned int:		0,			\
-		unsigned long:		0			\
+		unsigned long:		0,			\
+		unsigned long long:	0			\
 	)
 
 #define CKDINT_TEST_OP(op, a, b, expr)				\
@@ -76,6 +78,8 @@
 			op((a), (b), INT_MIN, INT_MAX),		\
 		long:						\
 			op((a), (b), LONG_MIN, LONG_MAX),	\
+		long long:					\
+			op((a), (b), LLONG_MIN, LLONG_MAX),	\
 		unsigned char:					\
 			op((a), (b), 0, UCHAR_MAX),		\
 		unsigned short:					\
@@ -83,7 +87,9 @@
 		unsigned int:					\
 			op((a), (b), 0, UINT_MAX),		\
 		unsigned long:					\
-			op((a), (b), 0, ULONG_MAX)		\
+			op((a), (b), 0, ULONG_MAX),		\
+		unsigned long long:				\
+			op((a), (b), 0, ULLONG_MAX)		\
 	)
 
 #define CKDINT_SAFE_UNEGATE(x)					\
@@ -605,4 +611,4 @@ static CKDINT_INLINE int ckdint_test_mixmul_ures(intmax_t a, uintmax_t b,
 
 #endif /* CKDINT_HAS_INCLUDE(<stdckdint.h>) */
 
-#endif /* !defined(CKDINT_H) */
+#endif /* CKDINT_H */
