@@ -512,7 +512,7 @@ static CKDINT_INLINE int ckdint_test_mixsub_uasb_ures(uintmax_t a, intmax_t b,
 		)						\
 	)
 
-static CKDINT_INLINE int ckdint_test_umul(uintmax_t a, uintmax_t b, 
+static CKDINT_INLINE int ckdint_test_umul(uintmax_t a, uintmax_t b,
 					  uintmax_t max)
 {
 	return (b > 0) && (a > (max / b));
@@ -599,14 +599,29 @@ static CKDINT_INLINE int ckdint_test_mixmul_ures(intmax_t a, uintmax_t b,
 
 #if CKDINT_HAS_BUILTIN(__builtin_add_overflow)
 #define ckdint_add(res, a, b)	__builtin_add_overflow((a), (b), (res))
+#else
+#define ckdint_add(res, a, b)				\
+	(ckdint_test_add((a), (b), *(res))		\
+		? 1					\
+		: (*(res) = (a) + (b), 0))
 #endif
 
 #if CKDINT_HAS_BUILTIN(__builtin_sub_overflow)
 #define ckdint_sub(res, a, b)	__builtin_sub_overflow((a), (b), (res))
+#else
+#define ckdint_sub(res, a, b)				\
+	(ckdint_test_sub((a), (b), *(res))		\
+		? 1					\
+		: (*(res) = (a) - (b), 0))
 #endif
 
 #if CKDINT_HAS_BUILTIN(__builtin_mul_overflow)
 #define ckdint_mul(res, a, b)	__builtin_mul_overflow((a), (b), (res))
+#else
+#define ckdint_mul(res, a, b)				\
+	(ckdint_test_mul((a), (b), *(res))		\
+		? 1					\
+		: (*(res) = (a) * (b), 0))
 #endif
 
 #endif /* CKDINT_HAS_INCLUDE(<stdckdint.h>) */
